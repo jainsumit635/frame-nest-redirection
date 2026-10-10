@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FrameNest - Redirecting...</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-gradient: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #0f172a 50%, #020617 100%);
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --accent-glow: rgba(99, 102, 241, 0.35);
+      --card-bg: rgba(15, 23, 42, 0.75);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    body {
+      background: var(--bg-gradient);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      color: var(--text-main);
+      overflow-x: hidden;
+    }
+
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 2.5rem 2rem;
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6), 0 0 30px var(--accent-glow);
+      animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(16px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .logo-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 64px;
+      height: 64px;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      border-radius: 16px;
+      margin-bottom: 1.25rem;
+      box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.5);
+    }
+
+    .logo-badge svg {
+      width: 34px;
+      height: 34px;
+      fill: #ffffff;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      margin-bottom: 0.5rem;
+    }
+
+    p.subtitle {
+      color: var(--text-sub);
+      font-size: 0.95rem;
+      margin-bottom: 2rem;
+      line-height: 1.5;
+    }
+
+    .spinner-container {
+      margin-bottom: 1.75rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(99, 102, 241, 0.2);
+      border-top: 3px solid var(--accent);
+      border-radius: 50%;
+      animation: spin 1s cubic-bezier(0.6, 0.2, 0.4, 0.8) infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .status-box {
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 0.85rem;
+      margin-bottom: 1.5rem;
+      font-size: 0.85rem;
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 10px #22c55e;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.8); }
+    }
+
+    .btn {
+      display: inline-block;
+      width: 100%;
+      padding: 0.85rem 1.25rem;
+      background: linear-gradient(135deg, #6366f1, #4f46e5);
+      color: #fff;
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-decoration: none;
+      border-radius: 12px;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6);
+    }
+
+    .manual-link {
+      margin-top: 1.25rem;
+      font-size: 0.85rem;
+      color: var(--text-sub);
+    }
+
+    .manual-link a {
+      color: #a5b4fc;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    .manual-link a:hover {
+      color: #fff;
+    }
+
+    /* Config Modal / Manual Input State */
+    .manual-config {
+      display: none;
+      margin-top: 1.5rem;
+      text-align: left;
+    }
+
+    .input-group {
+      margin-bottom: 1rem;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--text-sub);
+      margin-bottom: 0.35rem;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 0.75rem;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    .input-group input:focus {
+      border-color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <div class="logo-badge">
+      <!-- Frame / Photo Icon -->
+      <svg viewBox="0 0 24 24">
+        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5.04-6.71l-2.75 3.54-1.96-2.36L6.5 17h11l-3.54-4.71z"/>
+      </svg>
+    </div>
+
+    <h1>Connecting to FrameNest</h1>
+    <p class="subtitle">Fetching the latest active server tunnel and redirecting you securely...</p>
+
+    <div class="spinner-container">
+      <div class="spinner"></div>
+    </div>
+
+    <div class="status-box">
+      <div class="status-dot"></div>
+      <span id="status-text">Resolving live tunnel endpoint...</span>
+    </div>
+
+    <a id="redirect-btn" href="#" class="btn" style="display: none;">Open FrameNest Now</a>
+
+    <div class="manual-link">
+      Need to update or manually enter tunnel URL? <a onclick="toggleManualConfig()">Click here</a>
+    </div>
+
+    <div id="manual-config" class="manual-config">
+      <div class="input-group">
+        <label for="tunnel-input">Custom / Latest Tunnel URL:</label>
+        <input type="url" id="tunnel-input" placeholder="https://xxxx-xx-xx-xx.trycloudflare.com">
+      </div>
+      <button class="btn" onclick="saveAndRedirect()">Save & Go</button>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * CONFIGURATION:
+     * 1. If you push the active tunnel URL to a file in your repo (e.g. `current-tunnel.json` or `tunnel.txt`),
+     *    this page will automatically fetch it and redirect instantly.
+     * 2. Alternatively, fallback to localStorage or query param: ?url=https://xyz.trycloudflare.com
+     */
+    const TUNNEL_INFO_URL = 'current-tunnel.json'; // Can be relative or an external raw URL/gist
+
+    function getQueryParam(name) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(name);
+    }
+
+    function doRedirect(targetUrl) {
+      if (!targetUrl) return;
+      if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
+        targetUrl = 'https://' + targetUrl;
+      }
+      
+      const statusText = document.getElementById('status-text');
+      const redirectBtn = document.getElementById('redirect-btn');
+
+      statusText.textContent = 'Redirecting to ' + targetUrl.replace(/^https?:\/\//, '').split('/')[0] + '...';
+      redirectBtn.href = targetUrl;
+      redirectBtn.style.display = 'inline-block';
+
+      // Keep in localStorage for fast future loads
+      localStorage.setItem('framenest_last_tunnel', targetUrl);
+
+      // Perform redirect
+      setTimeout(() => {
+        window.location.href = targetUrl;
+      }, 900);
+    }
+
+    function toggleManualConfig() {
+      const conf = document.getElementById('manual-config');
+      conf.style.display = conf.style.display === 'block' ? 'none' : 'block';
+      const last = localStorage.getItem('framenest_last_tunnel') || '';
+      document.getElementById('tunnel-input').value = last;
+    }
+
+    function saveAndRedirect() {
+      const val = document.getElementById('tunnel-input').value.trim();
+      if (val) {
+        doRedirect(val);
+      }
+    }
+
+    async function init() {
+      // 1. Check URL query parameters (e.g., https://user.github.io/framenest/?url=https://xxx.trycloudflare.com)
+      const paramUrl = getQueryParam('url') || getQueryParam('target');
+      if (paramUrl) {
+        doRedirect(paramUrl);
+        return;
+      }
+
+      // 2. Try fetching dynamic current-tunnel.json file (cache-busted)
+      try {
+        const res = await fetch(TUNNEL_INFO_URL + '?t=' + Date.now());
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.url) {
+            doRedirect(data.url);
+            return;
+          }
+        }
+      } catch (e) {
+        console.warn('Could not fetch dynamic current-tunnel.json:', e);
+      }
+
+      // 3. Fallback to localStorage if previously visited
+      const saved = localStorage.getItem('framenest_last_tunnel');
+      if (saved) {
+        document.getElementById('status-text').textContent = 'Redirecting to last known instance...';
+        doRedirect(saved);
+        return;
+      }
+
+      // 4. If no URL found, show manual config
+      document.getElementById('status-text').textContent = 'No active tunnel found. Enter URL manually:';
+      document.getElementById('manual-config').style.display = 'block';
+    }
+
+    window.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

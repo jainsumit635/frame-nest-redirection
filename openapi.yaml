@@ -1,0 +1,579 @@
+openapi: 3.0.3
+info:
+  title: Family Media API
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+paths:
+  /api/v1/health:
+    get:
+      summary: Health check
+      responses:
+        '200':
+          description: OK
+  /api/v1/auth/register:
+    post:
+      summary: Register user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string }
+                password: { type: string }
+                displayName: { type: string }
+      responses:
+        '201': { description: Created }
+  /api/v1/auth/login:
+    post:
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string }
+                password: { type: string }
+      responses:
+        '200': { description: OK }
+  /api/v1/auth/refresh:
+    post:
+      summary: Refresh token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refreshToken]
+              properties:
+                refreshToken: { type: string }
+      responses:
+        '200': { description: OK }
+  /api/v1/auth/logout:
+    post:
+      summary: Logout
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refreshToken]
+              properties:
+                refreshToken: { type: string }
+      responses:
+        '200': { description: OK }
+  /api/v1/me:
+    get:
+      summary: Current user profile
+      security:
+        - bearerAuth: []
+      responses:
+        '200': { description: OK }
+  /api/v1/albums:
+    get:
+      summary: List albums (owned and shared)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+        - in: query
+          name: limit
+          schema: { type: integer, default: 20 }
+      responses:
+        '200': { description: OK }
+    post:
+      summary: Create album
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title]
+              properties:
+                title: { type: string }
+                description: { type: string }
+      responses:
+        '201': { description: Created }
+  /api/v1/albums/{id}:
+    get:
+      summary: Get album
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200': { description: OK }
+    patch:
+      summary: Update album
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title]
+              properties:
+                title: { type: string }
+                description: { type: string }
+      responses:
+        '200': { description: OK }
+    delete:
+      summary: Delete album
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200': { description: OK }
+  /api/v1/albums/{id}/media:
+    post:
+      summary: Add media items to album
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [mediaIds]
+              properties:
+                mediaIds:
+                  type: array
+                  items: { type: integer }
+      responses:
+        '200': { description: OK }
+  /api/v1/albums/{id}/media/{mediaId}:
+    delete:
+      summary: Remove media item from album
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+        - in: path
+          name: mediaId
+          required: true
+          schema: { type: integer }
+      responses:
+        '200': { description: OK }
+  /api/v1/albums/{id}/cover:
+    patch:
+      summary: Set album cover media
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [mediaId]
+              properties:
+                mediaId: { type: integer }
+      responses:
+        '200': { description: OK }
+  /api/v1/albums/{id}/members:
+    get:
+      summary: List album collaborators
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200': { description: OK }
+    post:
+      summary: Invite or update album collaborator
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, role]
+              properties:
+                email: { type: string }
+                role: { type: string, enum: [viewer, editor] }
+      responses:
+        '200': { description: OK }
+  /api/v1/albums/{id}/members/{userId}:
+    delete:
+      summary: Revoke collaborator access from album
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+        - in: path
+          name: userId
+          required: true
+          schema: { type: integer }
+      responses:
+        '200': { description: OK }
+  /api/v1/media/upload:
+    post:
+      summary: Upload media file (image or video)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                album_id:
+                  type: integer
+      responses:
+        '201': { description: Created }
+  /api/v1/media:
+    get:
+      summary: List user media items
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+        - in: query
+          name: limit
+          schema: { type: integer, default: 24 }
+        - in: query
+          name: album_id
+          schema: { type: integer }
+      responses:
+        '200': { description: OK }
+  /api/v1/media/{id}:
+    get:
+      summary: Get media metadata
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200': { description: OK }
+  /api/v1/media/{id}/thumbnail:
+    get:
+      summary: Stream media thumbnail
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: OK
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+  /api/v1/media/{id}/gif:
+    get:
+      summary: Stream animated preview GIF/WebP for videos
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: OK
+          content:
+            image/gif:
+              schema:
+                type: string
+                format: binary
+  /api/v1/media/{id}/stream:
+    get:
+      summary: Stream video with HTTP 206 Range request support
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '206':
+          description: Partial Content
+          content:
+            video/mp4:
+              schema:
+                type: string
+                format: binary
+  /api/v1/media/{id}/file:
+    get:
+      summary: Stream original media file
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: OK
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+  /api/v1/media/{id}:
+    delete:
+      summary: Delete media item
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200': { description: OK }
+  /api/v1/albums/{id}/share-links:
+    post:
+      summary: Create public share link for album
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password: { type: string }
+                expiresInDays: { type: integer }
+                allowDownload: { type: boolean }
+      responses:
+        '201': { description: Created }
+    get:
+      summary: List share links for album
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200': { description: OK }
+  /api/v1/albums/{id}/share-links/{linkId}:
+    delete:
+      summary: Revoke public share link
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+        - in: path
+          name: linkId
+          required: true
+          schema: { type: integer }
+      responses:
+        '200': { description: OK }
+  /api/v1/public/albums/{token}:
+    get:
+      summary: Public album metadata and media list
+      parameters:
+        - in: path
+          name: token
+          required: true
+          schema: { type: string }
+        - in: header
+          name: X-Share-Password
+          required: false
+          schema: { type: string }
+      responses:
+        '200': { description: OK }
+        '401': { description: Password required or incorrect }
+        '404': { description: Not Found or expired }
+  /api/v1/public/media/{token}/{mediaId}/thumbnail:
+    get:
+      summary: Public media thumbnail
+      parameters:
+        - in: path
+          name: token
+          required: true
+          schema: { type: string }
+        - in: path
+          name: mediaId
+          required: true
+          schema: { type: integer }
+      responses:
+        '200': { description: OK }
+  /api/v1/public/media/{token}/{mediaId}/stream:
+    get:
+      summary: Public video range stream
+      parameters:
+        - in: path
+          name: token
+          required: true
+          schema: { type: string }
+        - in: path
+          name: mediaId
+          required: true
+          schema: { type: integer }
+      responses:
+        '206': { description: Partial Content }
+  /api/v1/public/media/{token}/{mediaId}/file:
+    get:
+      summary: Public original file download (if allowed)
+      parameters:
+        - in: path
+          name: token
+          required: true
+          schema: { type: string }
+        - in: path
+          name: mediaId
+          required: true
+          schema: { type: integer }
+      responses:
+        '200': { description: OK }
+  /api/v1/import/scan:
+    post:
+      summary: Dry run scan of a server folder
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [path]
+              properties:
+                path: { type: string }
+      responses:
+        '200': { description: OK }
+  /api/v1/import/execute:
+    post:
+      summary: Execute server folder batch import
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [sourcePath]
+              properties:
+                sourcePath: { type: string }
+                mode: { type: string, enum: [copy, move, index], default: copy }
+                targetAlbumId: { type: integer }
+                autoAlbumFolders: { type: boolean, default: false }
+                skipDuplicates: { type: boolean, default: true }
+      responses:
+        '202': { description: Accepted }
+  /api/v1/import/jobs:
+    get:
+      summary: List user import jobs
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+        - in: query
+          name: limit
+          schema: { type: integer, default: 20 }
+      responses:
+        '200': { description: OK }
+  /api/v1/import/jobs/{id}:
+    get:
+      summary: Get import job details and real-time progress
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200': { description: OK }
+  /api/v1/import/jobs/{id}/cancel:
+    post:
+      summary: Cancel an ongoing import job
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200': { description: OK }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
